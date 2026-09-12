@@ -1,0 +1,88 @@
+name: NomadX Production CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-and-validate:
+    name: Production Gate & Security Validation
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: strong_postgres_password_2026
+          POSTGRES_DB: nomadx_production
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Execute Database Schema Migrations (Alembic)
+        env:
+          ENV: production
+          DB_URL: postgresql+asyncpg://postgres:strong_postgres_password_2026@localhost:5432/nomadx_production
+          JWT_SECRET: 68b3f81e3a47d26c59b20e1847a960df72c3d18063f458129486c91e70d42bc1
+          INTERNAL_SECRET: c81b2e3f4a5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f
+        run: |
+          alembic upgrade head
+
+      - name: Run Full Automated Test Suite (Pytest)
+        env:
+          ENV: production
+          DB_URL: postgresql+asyncpg://postgres:strong_postgres_password_2026@localhost:5432/nomadx_production
+          JWT_SECRET: 68b3f81e3a47d26c59b20e1847a960df72c3d18063f458129486c91e70d42bc1
+          INTERNAL_SECRET: c81b2e3f4a5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f
+        run: |
+          python -m pytest --maxfail=1
+
+      - name: Security Posture & Secrets Entropy Diagnostics
+        env:
+          ENV: production
+          DB_URL: postgresql+asyncpg://postgres:strong_postgres_password_2026@localhost:5432/nomadx_production
+          JWT_SECRET: 68b3f81e3a47d26c59b20e1847a960df72c3d18063f458129486c91e70d42bc1
+          INTERNAL_SECRET: c81b2e3f4a5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f
+        run: |
+          python scripts/activate_production.py
+
+      - name: End-to-End Canary Validation Gate
+        env:
+          ENV: production
+          DB_URL: postgresql+asyncpg://postgres:strong_postgres_password_2026@localhost:5432/nomadx_production
+          JWT_SECRET: 68b3f81e3a47d26c59b20e1847a960df72c3d18063f458129486c91e70d42bc1
+          INTERNAL_SECRET: c81b2e3f4a5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f
+        run: |
+          python scripts/canary_validation.py
