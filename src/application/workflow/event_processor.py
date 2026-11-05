@@ -1,9 +1,11 @@
+from __future__ import annotations
 import json
 import logging
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 from uuid import uuid4
 from sqlalchemy import select, or_
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...domain.shared.clock.clock import Clock
 from ...domain.organization.value_objects import OrganizationId
