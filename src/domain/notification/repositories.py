@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 
 from .notification import Notification
-from .value_objects import NotificationId, NotificationReference, NotificationIdempotencyKey
+from .value_objects import NotificationId, NotificationReference, NotificationIdempotencyKey, NotificationChannel
 from ..organization.value_objects import OrganizationId
 
 
