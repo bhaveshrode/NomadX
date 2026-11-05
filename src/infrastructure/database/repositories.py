@@ -1,3 +1,4 @@
+from __future__ import annotations
 import json
 import contextvars
 from decimal import Decimal
@@ -113,6 +114,7 @@ from ...domain.payment import (
 from ...domain.payment.payment import ReconciliationStatus
 from ...domain.payment.repositories import IPaymentIntentRepository, IPaymentRepository
 from ...domain.receivable.repositories import IReceivableRepository
+from ...domain.receivable.receivable import Receivable
 from ...domain.settlement.repositories import ISettlementRepository
 from ...domain.settlement.settlement import Settlement, SettlementStatus
 from ...domain.settlement.value_objects import (
