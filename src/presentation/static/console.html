@@ -451,7 +451,7 @@
                     <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400 text-xs"></i> <span>250,000 Monthly API Requests (vs 50,000 current)</span></li>
                     <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400 text-xs"></i> <span>500 Invoices Allowance / Mo (vs 100 current)</span></li>
                     <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400 text-xs"></i> <span>15 Team Member Seats (vs 5 current)</span></li>
-                    <li class="flex items-center gap-2"><i class="fa-solid fa-shield-check text-brand-400 text-xs"></i> <span>24/7 Dedicated Support & High Priority SLA</span></li>
+                    <li class="flex items-center gap-2"><i class="fa-solid fa-shield-halved text-brand-400 text-xs"></i> <span>24/7 Dedicated Support & High Priority SLA</span></li>
                 </ul>
             </div>
 
@@ -596,10 +596,10 @@
     </div>
 
     <!-- MAIN PORTAL APPLICATION WRAPPER (Hidden when logged out) -->
-    <div id="portalContainer" class="hidden min-h-screen flex flex-col md:flex-row bg-darkbg-900">
+    <div id="portalContainer" class="hidden min-h-screen md:h-screen md:overflow-hidden flex flex-col md:flex-row bg-darkbg-900">
         
         <!-- SIDEBAR NAVIGATION -->
-        <aside class="w-full md:w-64 bg-darkbg-800/80 border-r border-gray-800/60 flex flex-col justify-between shrink-0 glass">
+        <aside class="w-full md:w-64 bg-darkbg-800/80 border-r border-gray-800/60 flex flex-col justify-between shrink-0 glass md:h-full md:overflow-y-auto">
             <div>
                 <!-- Brand logo Header -->
                 <div class="h-16 px-6 border-b border-gray-800/40 flex items-center justify-between">
@@ -684,7 +684,7 @@
         </aside>
 
         <!-- MAIN CONTENT AREA -->
-        <main class="flex-1 flex flex-col min-w-0">
+        <main class="flex-1 flex flex-col min-w-0 md:min-h-0">
             <!-- Header Status Bar -->
             <header class="h-16 px-8 bg-darkbg-800/40 border-b border-gray-800/60 flex items-center justify-between shrink-0 glass">
                 <div class="flex items-center gap-4">
@@ -706,7 +706,7 @@
             </header>
 
             <!-- TAB VIEWS CONTAINER -->
-            <div class="flex-1 overflow-y-auto p-8" id="tabContent">
+            <div class="flex-1 min-h-0 overflow-y-auto p-8" id="tabContent">
                 
                 <!-- 1. DASHBOARD TAB VIEW -->
                 <div id="tabView-dashboard" class="space-y-6">
@@ -758,7 +758,7 @@
                     <div>
                         <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 font-outfit flex items-center justify-between">
                             <span>Accounts Receivable & Financial Operations Overview</span>
-                            <span class="text-[10px] text-brand-300 font-mono"><i class="fa-solid fa-shield-check text-emerald-400 mr-1"></i> Double-Entry Ledger Verified</span>
+                            <span class="text-[10px] text-brand-300 font-mono"><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Double-Entry Ledger Verified</span>
                         </h4>
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                             <div class="glass-card p-4 rounded-xl space-y-1 border-l-4 border-l-brand-500">
@@ -795,12 +795,16 @@
                             </div>
                         </div>
                     </div>
-                            <div class="flex items-center justify-between text-xs text-gray-400">
-                                <span class="font-semibold uppercase tracking-wider">Audit Security</span>
-                                <i class="fa-solid fa-lock text-brand-300"></i>
-                            </div>
-                            <div class="text-xl font-bold font-outfit text-brand-300">Immutable</div>
-                            <p class="text-[11px] text-gray-400">Governance Audit Trail Active</p>
+
+                    <!-- Governance Audit Security -->
+                    <div class="glass-card p-5 rounded-xl flex items-center justify-between">
+                        <div>
+                            <h4 class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Audit Security</h4>
+                            <p class="text-xl font-bold font-outfit text-brand-300">Immutable</p>
+                            <p class="text-[11px] text-gray-400 font-mono">Governance Audit Trail Active</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center text-brand-400">
+                            <i class="fa-solid fa-lock text-lg"></i>
                         </div>
                     </div>
 
@@ -1024,7 +1028,7 @@
                         <div id="anomalyOverviewBanner" class="glass-card p-5 rounded-xl border border-emerald-500/30 flex items-center justify-between">
                             <div class="flex items-center gap-4">
                                 <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl">
-                                    <i class="fa-solid fa-shield-check"></i>
+                                    <i class="fa-solid fa-shield-halved"></i>
                                 </div>
                                 <div>
                                     <h4 class="text-base font-bold text-white font-outfit" id="anomalyStatusTitle">All Systems Operating Normally</h4>
@@ -1568,6 +1572,9 @@
             document.querySelectorAll("#tabContent > div").forEach(div => div.classList.add("hidden"));
             const view = document.getElementById(`tabView-${tabId}`);
             if (view) view.classList.remove("hidden");
+
+            const content = document.getElementById("tabContent");
+            if (content) content.scrollTop = 0;
 
             if (tabId === "dashboard") {
                 fetchTelemetryTraces();
@@ -2379,7 +2386,7 @@
                                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400 text-[10px]"></i> <span class="font-mono text-gray-200">${plan.api_limit_monthly.toLocaleString()}</span> API Requests</li>
                                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400 text-[10px]"></i> <span class="font-mono text-gray-200">${plan.invoices_allowance_monthly}</span> Invoices Allowance</li>
                                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400 text-[10px]"></i> <span class="font-mono text-gray-200">${plan.team_members_limit}</span> Team Member Seats</li>
-                                <li class="flex items-center gap-2"><i class="fa-solid fa-shield-check text-brand-400 text-[10px]"></i> ${plan.support_level}</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-shield-halved text-brand-400 text-[10px]"></i> ${plan.support_level}</li>
                             </ul>
                         </div>
                         <div>
